@@ -1,0 +1,48 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+def load_image(path, mode=cv2.IMREAD_GRAYSCALE):
+    image = cv2.imread(path, mode)
+    if image is None:
+        raise FileNotFoundError(f"Error: Unable to load image at path: {path}")
+    return image
+
+def detect_edges(image, method="canny", threshold1=50, threshold2=150):
+    if method == "canny":
+        edges = cv2.Canny(image, threshold1, threshold2)
+    elif method == "sobel":
+        edges = cv2.Sobel(image, cv2.CV_64F, 1, 1, ksize=3)
+        edges = cv2.convertScaleAbs(edges)
+    elif method == "laplacian":
+        edges = cv2.Laplacian(image, cv2.CV_64F)
+        edges = cv2.convertScaleAbs(edges)
+    else:
+        raise ValueError("Invalid edge detection method. Choose 'canny', 'sobel', or 'laplacian'.")
+    return edges
+
+
+paths = {
+    "T_image": "/content/T.png",
+    "bricks": "/content/bricks.jpg",
+    "skin": "/content/skin.png"
+}
+
+try:
+    T_image = load_image(paths["T_image"])
+    edges_T_canny = detect_edges(T_image, method="canny")
+    edges_T_sobel = detect_edges(T_image, method="sobel")
+    edges_T_laplacian = detect_edges(T_image, method="laplacian")
+
+
+    plt.figure(figsize=(12, 4))
+    plt.subplot(1, 3, 1); plt.title("T Image - Canny"); plt.imshow(edges_T_canny, cmap='gray'); plt.axis('off')
+    plt.subplot(1, 3, 2); plt.title("T Image - Sobel"); plt.imshow(edges_T_sobel, cmap='gray'); plt.axis('off')
+    plt.subplot(1, 3, 3); plt.title("T Image - Laplacian"); plt.imshow(edges_T_laplacian, cmap='gray'); plt.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+except FileNotFoundError as e:
+    print(e)
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
