@@ -1,0 +1,21 @@
+# Applying Canny detection specifically for the "T" image
+
+try:
+    T_image = load_image(paths["T_image"])
+
+    smoothed_T_image = cv2.GaussianBlur(T_image, (5, 5), 1.4)
+
+    # Apply Canny edge detection
+    edges_T_canny = cv2.Canny(smoothed_T_image, 50, 150)
+
+
+    plt.figure(figsize=(8, 6))
+    plt.subplot(1, 2, 1); plt.title("Original T Image"); plt.imshow(T_image, cmap='gray'); plt.axis('off')
+    plt.subplot(1, 2, 2); plt.title("T Image - Canny Edges"); plt.imshow(edges_T_canny, cmap='gray'); plt.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+except FileNotFoundError as e:
+    print(e)
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
