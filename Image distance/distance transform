@@ -1,0 +1,31 @@
+leaf_clean_image = Image.open(image_paths["leaf"]).convert('L')
+leaf_noisy_image = Image.open(image_paths["leaf_noisy"]).convert('L')
+
+binary_leaf_clean = np.array(leaf_clean_image) > 0
+binary_leaf_noisy = np.array(leaf_noisy_image) > 0
+
+distances = {
+    "Euclidean": (ndimage.distance_transform_edt(binary_leaf_clean),
+                  ndimage.distance_transform_edt(binary_leaf_noisy)),
+    "Cityblock": (ndimage.distance_transform_cdt(binary_leaf_clean, metric='taxicab'),
+                  ndimage.distance_transform_cdt(binary_leaf_noisy, metric='taxicab')),
+    "Chessboard": (ndimage.distance_transform_cdt(binary_leaf_clean, metric='chessboard'),
+                   ndimage.distance_transform_cdt(binary_leaf_noisy, metric='chessboard'))
+}
+
+plt.figure(figsize=(18, 12))
+
+for i, (method, (clean_dist, noisy_dist)) in enumerate(distances.items(), 1):
+
+    plt.subplot(3, 2, i * 2 - 1)
+    plt.imshow(clean_dist, cmap='viridis')
+    plt.title(f'{method} Distance Transform (Clean)')
+    plt.axis('off')
+
+    plt.subplot(3, 2, i * 2)
+    plt.imshow(noisy_dist, cmap='viridis')
+    plt.title(f'{method} Distance Transform (Noisy)')
+    plt.axis('off')
+
+plt.tight_layout()
+plt.show()
