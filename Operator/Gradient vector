@@ -1,0 +1,11 @@
+fig, ax = plt.subplots(figsize=(10, 10))
+
+ax.imshow(image_T, cmap='gray')
+ax.set_title("Gradient Vectors Visualization")
+ax.axis('off')
+
+step = 10
+y, x = np.mgrid[0:image_T.shape[0]:step, 0:image_T.shape[1]:step]
+ax.quiver(x, y, Jx[::step, ::step], Jy[::step, ::step], color='r', scale=50)
+
+plt.show()
