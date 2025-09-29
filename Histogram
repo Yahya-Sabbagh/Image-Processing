@@ -1,0 +1,161 @@
+from PIL import Image
+import numpy as np
+
+image_path = '/content/bacteria.jpg'
+image = Image.open(image_path).convert('L')
+image_array = np.array(image)
+
+mean_value = np.mean(image_array)
+std_deviation = np.std(image_array)
+median_value = np.median(image_array)
+
+mean_value, std_deviation, median_value
+
+import matplotlib.pyplot as plt
+
+chro_image_path = '/content/chro.bmp'
+chro_image = Image.open(chro_image_path).convert('L')
+chro_image_array = np.array(chro_image)
+
+plt.figure(figsize=(10, 5))
+
+plt.subplot(1, 2, 1)
+plt.hist(chro_image_array.ravel(), bins=64, color='blue', alpha=0.7)
+plt.title('Histogram (64 bins)')
+plt.xlabel('Pixel Intensity')
+plt.ylabel('Frequency')
+
+plt.subplot(1, 2, 2)
+plt.hist(chro_image_array.ravel(), bins=16, color='green', alpha=0.7)
+plt.title('Histogram (16 bins)')
+plt.xlabel('Pixel Intensity')
+plt.ylabel('Frequency')
+
+plt.tight_layout()
+plt.show()
+
+cumulative_hist = np.cumsum(np.histogram(chro_image_array.ravel(), bins=256)[0])
+
+plt.figure(figsize=(6, 4))
+plt.plot(cumulative_hist, color='red')
+plt.title('Cumulative Histogram')
+plt.xlabel('Pixel Intensity')
+plt.ylabel('Cumulative Frequency')
+plt.grid()
+plt.show()
+
+total_pixels = chro_image_array.size
+median_idx = np.where(cumulative_hist >= total_pixels / 2)[0][0]
+median_value_cumulative = median_idx
+
+rotated_image = chro_image.rotate(90)
+rotated_image_array = np.array(rotated_image)
+
+rotated_hist = np.histogram(rotated_image_array.ravel(), bins=256)
+
+complement_image_array = 255 - chro_image_array
+
+complement_hist = np.histogram(complement_image_array.ravel(), bins=256)
+
+rotated_hist[0], complement_hist[0], median_value_cumulative
+
+
+
+from skimage import exposure
+import numpy as np
+import matplotlib.pyplot as plt
+def custom_histogram_stretching(image_array):
+    min_val = np.min(image_array)
+    max_val = np.max(image_array)
+    stretched_image = (image_array - min_val) * (255 / (max_val - min_val))
+    return stretched_image.astype(np.uint8)
+
+custom_stretched_image = custom_histogram_stretching(chro_image_array)
+
+skimage_stretched_image_default = exposure.rescale_intensity(chro_image_array, in_range='image')
+skimage_stretched_image_interval = exposure.rescale_intensity(chro_image_array, in_range=(50, 200), out_range=(0, 255))
+
+plt.figure(figsize=(12, 8))
+
+plt.subplot(2, 2, 1)
+plt.hist(chro_image_array.ravel(), bins=256, color='gray', alpha=0.7)
+plt.title('Original Histogram')
+plt.xlabel('Pixel Intensity')
+plt.ylabel('Frequency')
+
+plt.subplot(2, 2, 2)
+plt.hist(custom_stretched_image.ravel(), bins=256, color='blue', alpha=0.7)
+plt.title('Custom Histogram Stretching')
+plt.xlabel('Pixel Intensity')
+plt.ylabel('Frequency')
+
+plt.subplot(2, 2, 3)
+plt.hist(skimage_stretched_image_default.ravel(), bins=256, color='green', alpha=0.7)
+plt.title('Skimage Stretching (Default)')
+plt.xlabel('Pixel Intensity')
+plt.ylabel('Frequency')
+
+plt.subplot(2, 2, 4)
+plt.hist(skimage_stretched_image_interval.ravel(), bins=256, color='red', alpha=0.7)
+plt.title('Skimage Stretching (Specified Interval)')
+plt.xlabel('Pixel Intensity')
+plt.ylabel('Frequency')
+
+plt.tight_layout()
+plt.show()
+
+np.min(custom_stretched_image), np.max(custom_stretched_image), \
+np.min(skimage_stretched_image_default), np.max(skimage_stretched_image_default), \
+np.min(skimage_stretched_image_interval), np.max(skimage_stretched_image_interval)
+
+
+elaine_image_path = '/content/elaine.jpg'
+neck_image_path = '/content/neck.bmp'
+covering_image_path = '/content//covering.bmp'
+rocks_image_path = '/content/rocks.jpg'
+umbrella_image_path = '/content/umbrella.jpg'
+
+elaine_image = Image.open(elaine_image_path).convert('L')
+neck_image = Image.open(neck_image_path).convert('L')
+covering_image = Image.open(covering_image_path).convert('L')
+
+elaine_array = np.array(elaine_image)
+neck_array = np.array(neck_image)
+covering_array = np.array(covering_image)
+
+rocks_image = Image.open(rocks_image_path).convert('RGB')
+umbrella_image = Image.open(umbrella_image_path).convert('RGB')
+
+rocks_array = np.array(rocks_image)
+umbrella_array = np.array(umbrella_image)
+
+elaine_equalized = exposure.equalize_hist(elaine_array)
+neck_equalized = exposure.equalize_hist(neck_array)
+covering_equalized = exposure.equalize_hist(covering_array)
+
+rocks_equalized = np.stack(
+    [exposure.equalize_hist(rocks_array[:, :, i]) for i in range(3)], axis=-1
+)
+umbrella_equalized = np.stack(
+    [exposure.equalize_hist(umbrella_array[:, :, i]) for i in range(3)], axis=-1
+)
+
+elaine_mean_std = (np.mean(elaine_array), np.std(elaine_array))
+elaine_equalized_mean_std = (np.mean(elaine_equalized), np.std(elaine_equalized))
+
+neck_mean_std = (np.mean(neck_array), np.std(neck_array))
+neck_equalized_mean_std = (np.mean(neck_equalized), np.std(neck_equalized))
+
+covering_mean_std = (np.mean(covering_array), np.std(covering_array))
+covering_equalized_mean_std = (np.mean(covering_equalized), np.std(covering_equalized))
+
+rocks_equalized_image = Image.fromarray((rocks_equalized * 255).astype(np.uint8))
+umbrella_equalized_image = Image.fromarray((umbrella_equalized * 255).astype(np.uint8))
+rocks_equalized_image.save('/content/rocks_equalized.jpg')
+umbrella_equalized_image.save('/content/umbrella_equalized.jpg')
+
+elaine_mean_std, elaine_equalized_mean_std, \
+neck_mean_std, neck_equalized_mean_std, \
+covering_mean_std, covering_equalized_mean_std, \
+"/content/rocks_equalized.jpg", "/content/umbrella_equalized.jpg"
+
