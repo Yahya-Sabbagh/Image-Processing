@@ -1,0 +1,60 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+
+uploaded = files.upload()
+image_path = list(uploaded.keys())[0]
+
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+if image is None:
+    print(f"Error: Image not found or could not be loaded. Check the file path: {image_path}")
+    exit()
+
+_, binary_image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+
+filled_image = binary_image.copy()
+
+h, w = binary_image.shape
+mask = np.zeros((h + 2, w + 2), np.uint8)
+
+cv2.floodFill(filled_image, mask, (0, 0), 255)
+
+holes = cv2.bitwise_not(filled_image)
+
+binary_result = cv2.bitwise_or(binary_image, holes)
+
+kernel = np.ones((3, 3), np.uint8)
+
+closed_image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
+
+plt.figure(figsize=(15, 10))
+
+plt.subplot(2, 3, 1)
+plt.imshow(binary_image, cmap='gray')
+plt.title('Original Binary Image')
+plt.axis('off')
+
+plt.subplot(2, 3, 2)
+plt.imshow(filled_image, cmap='gray')
+plt.title('Filled Binary Image')
+plt.axis('off')
+
+plt.subplot(2, 3, 3)
+plt.imshow(binary_result, cmap='gray')
+plt.title('Binary Result (Holes Filled)')
+plt.axis('off')
+
+plt.subplot(2, 3, 4)
+plt.imshow(image, cmap='gray')
+plt.title('Original Grayscale Image')
+plt.axis('off')
+
+plt.subplot(2, 3, 5)
+plt.imshow(closed_image, cmap='gray')
+plt.title('Closed Grayscale Image (Holes Filled)')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
