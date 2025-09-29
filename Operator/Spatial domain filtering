@@ -1,0 +1,27 @@
+H1 = np.ones((3, 3)) / 9
+H2 = np.array([[1, 0, -1], [1, 0, -1], [1, 0, -1]])
+H3 = np.array([[0, -1, 0], [-1, 4, -1], [0, -1, 0]])
+
+filtered_H1 = convolve(image_T, H1, mode='nearest')
+filtered_H2 = convolve(image_T, H2, mode='nearest')
+filtered_H3 = convolve(image_T, H3, mode='nearest')
+
+fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+axes[0].imshow(image_T, cmap='gray')
+axes[0].set_title("Original Image")
+axes[0].axis('off')
+
+axes[1].imshow(filtered_H1, cmap='gray')
+axes[1].set_title("H1: Averaging Filter")
+axes[1].axis('off')
+
+axes[2].imshow(filtered_H2, cmap='gray')
+axes[2].set_title("H2: Vertical Gradient Filter")
+axes[2].axis('off')
+
+axes[3].imshow(filtered_H3, cmap='gray')
+axes[3].set_title("H3: Laplacian Filter")
+axes[3].axis('off')
+
+plt.tight_layout()
+plt.show()
