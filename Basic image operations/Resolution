@@ -1,0 +1,31 @@
+from skimage.transform import resize
+
+def subsample_image(image, step):
+    return image[::step, ::step]
+
+crossroad_image = io.imread('/content/crossroad.bmp')
+
+steps = [2, 4, 8, 16]
+resampled_images = {}
+
+plt.figure(figsize=(12, 8))
+for i, step in enumerate(steps, 1):
+    subsampled_img = subsample_image(crossroad_image, step)
+    resampled_images[f"subsample_{step}"] = subsampled_img
+    plt.subplot(2, 4, i)
+    plt.imshow(subsampled_img, cmap='gray')
+    plt.title(f"Subsampling - Step {step}")
+    plt.axis('off')
+
+for i, step in enumerate(steps, 1):
+    resized_img = resize(crossroad_image,
+                         (crossroad_image.shape[0] // step, crossroad_image.shape[1] // step),
+                         anti_aliasing=True)
+    resampled_images[f"resize_{step}"] = resized_img
+    plt.subplot(2, 4, i + 4)
+    plt.imshow(resized_img, cmap='gray')
+    plt.title(f"Resized - Step {step}")
+    plt.axis('off')
+
+plt.tight_layout()
+plt.show()
