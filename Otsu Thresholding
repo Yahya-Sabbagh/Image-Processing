@@ -1,0 +1,126 @@
+from skimage.filters import threshold_otsu
+from skimage.color import rgb2gray
+from PIL import Image
+import numpy as np
+
+gdr_image_path = '/content/gdr.bmp'
+objects_image_path = '/content/objects.bmp'
+
+gdr_image = Image.open(gdr_image_path).convert('L')
+objects_image = Image.open(objects_image_path).convert('L')
+
+gdr_array = np.array(gdr_image)
+objects_array = np.array(objects_image)
+
+thresholds = [50, 100, 150, 200]
+gdr_binarized = {t: (gdr_array > t).astype(np.uint8) for t in thresholds}
+objects_binarized = {t: (objects_array > t).astype(np.uint8) for t in thresholds}
+
+otsu_gdr_threshold = threshold_otsu(gdr_array)
+otsu_objects_threshold = threshold_otsu(objects_array)
+
+image_files = {
+    "gdr": "/content/gdr.bmp",
+    "objects": "/content/objects.bmp",
+    "bacteria": "/content/bacteria.jpg",
+    "cell": "/content/cell.bmp",
+    "gear_wheel": "/content/gear-wheel.png",
+    "fibers": "/content/fibers.jpg",
+    "fibers2": "/content/fibers2.jpg",
+    "I10": "/content/I10.bmp",
+    "I12": "/content/I12.bmp"
+}
+
+binary_results = {}
+otsu_thresholds = {}
+histograms = {}
+
+for name, path in image_files.items():
+    image = Image.open(path).convert('L')
+    image_array = np.array(image)
+    otsu_threshold = threshold_otsu(image_array)
+    otsu_thresholds[name] = otsu_threshold
+    binary_image = (image_array > otsu_threshold).astype(np.uint8)
+    binary_results[name] = binary_image
+    histograms[name] = np.histogram(image_array.ravel(), bins=256)
+
+otsu_thresholds
+
+gdr_otsu_binarized = (gdr_array > otsu_gdr_threshold).astype(np.uint8)
+objects_otsu_binarized = (objects_array > otsu_objects_threshold).astype(np.uint8)
+
+thresholds, otsu_gdr_threshold, otsu_objects_threshold
+
+stretched_images = {}
+stretched_binary_results = {}
+
+for name, path in image_files.items():
+    image = Image.open(path).convert('L')
+    image_array = np.array(image)
+
+    stretched_image = custom_histogram_stretching(image_array)
+    stretched_images[name] = stretched_image
+
+    stretched_threshold = threshold_otsu(stretched_image)
+    stretched_binary_image = (stretched_image > stretched_threshold).astype(np.uint8)
+    stretched_binary_results[name] = stretched_binary_image
+
+original_image_array = np.array(Image.open(image_files['bacteria']).convert('L'))
+stretched_image_array = stretched_images['bacteria']
+
+original_otsu_binary = binary_results['bacteria']
+stretched_otsu_binary = stretched_binary_results['bacteria']
+
+plt.figure(figsize=(12, 8))
+plt.subplot(2, 2, 1)
+plt.imshow(original_image_array, cmap='gray')
+plt.title('Original Image')
+
+
+plt.subplot(2, 2, 2)
+plt.imshow(original_otsu_binary, cmap='gray')
+plt.title('Original Binary (Otsu)')
+
+
+plt.subplot(2, 2, 3)
+plt.imshow(stretched_image_array, cmap='gray')
+plt.title('Stretched Image')
+
+
+plt.subplot(2, 2, 4)
+plt.imshow(stretched_otsu_binary, cmap='gray')
+plt.title('Stretched Binary (Otsu)')
+
+plt.tight_layout()
+plt.show()
+from skimage.color import rgb2hsv
+from skimage.measure import label, regionprops
+
+pills_image_path = '/content/pills2.bmp'
+pills_image = Image.open(pills_image_path).convert('RGB')
+pills_array = np.array(pills_image)
+
+pills_hsv = rgb2hsv(pills_array)
+hue_channel = pills_hsv[:, :, 0]
+green_mask = (hue_channel > 0.25) & (hue_channel < 0.45)
+binary_green_pills = green_mask.astype(np.uint8)
+
+total_green_pixels = np.sum(binary_green_pills)
+
+
+labeled_pills = label(binary_green_pills)
+regions = regionprops(labeled_pills)
+
+
+pill_areas = [region.area for region in regions]
+num_pills = len(pill_areas)
+
+
+plt.figure(figsize=(8, 6))
+plt.imshow(binary_green_pills, cmap='gray')
+plt.title('Isolated Green Pills (Binary Mask)')
+plt.axis('off')
+plt.show()
+
+total_green_pixels, num_pills, pill_areas
+
