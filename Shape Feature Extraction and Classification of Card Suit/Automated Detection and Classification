@@ -1,0 +1,81 @@
+import matplotlib.pyplot as plt
+from skimage import io, measure, color, morphology
+from skimage.filters import threshold_otsu
+import numpy as np
+import pandas as pd
+
+# Function to calculate circularity
+def calculate_circularity(area, perimeter):
+    if perimeter == 0:
+        return 0
+    return 4 * np.pi * (area / (perimeter ** 2))
+
+# Load the image
+image_path = "/content/cards.bmp"  # Update with your file path if needed
+image = io.imread(image_path)
+
+# Check if the image is already grayscale
+if len(image.shape) == 2:  # Grayscale images have only two dimensions
+    gray_image = image
+else:
+    gray_image = color.rgb2gray(image)
+
+# Binarize the image
+thresh = threshold_otsu(gray_image)
+binary_image = gray_image < thresh
+
+# Label connected components
+label_image = measure.label(binary_image)
+regions = measure.regionprops(label_image)
+
+# Feature extraction
+features = []
+for region in regions:
+    if region.area > 100:  # Filter small regions (noise)
+        centroid = region.centroid
+        bbox = region.bbox
+        area = region.area
+        perimeter = region.perimeter
+        circularity = calculate_circularity(area, perimeter)
+
+        features.append({
+            "Centroid": centroid,
+            "Width": bbox[3] - bbox[1],
+            "Height": bbox[2] - bbox[0],
+            "Area": area,
+            "Perimeter": perimeter,
+            "Circularity": circularity
+        })
+
+# Create a DataFrame for better readability
+df = pd.DataFrame(features)
+
+# Count the number of each shape (basic manual classification based on circularity thresholds)
+shape_counts = {
+    "Spade": 0,
+    "Club": 0,
+    "Heart": 0,
+    "Diamond": 0
+}
+
+for feature in features:
+    circularity = feature["Circularity"]
+    if circularity > 0.7:  # Example condition for circular shapes
+        shape_counts["Heart"] += 1
+    elif 0.5 < circularity <= 0.7:  # Example condition
+        shape_counts["Diamond"] += 1
+    elif 0.3 < circularity <= 0.5:
+        shape_counts["Club"] += 1
+    else:
+        shape_counts["Spade"] += 1
+
+# Display the labeled image
+plt.figure(figsize=(10, 6))
+plt.imshow(color.label2rgb(label_image, image=image, bg_label=0))
+plt.title("Labeled Image")
+plt.axis('off')
+plt.show()
+
+
+print("\nShape Counts:")
+print(shape_counts)
