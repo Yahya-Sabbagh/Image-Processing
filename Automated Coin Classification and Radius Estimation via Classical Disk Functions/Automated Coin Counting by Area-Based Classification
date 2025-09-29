@@ -34,3 +34,18 @@ axes[2].axis('off')
 
 plt.tight_layout()
 plt.show()
+import numpy as np
+from skimage.filters import threshold_otsu
+areas = [region.area for region in coin_regions]
+TAB = np.array(areas)
+TAB
+
+otsu_threshold = threshold_otsu(gray_image)
+binary_image = gray_image > otsu_threshold
+
+print(f'Otsu Threshold: {otsu_threshold}')
+plt.imshow(binary_image, cmap='gray')
+plt.title('Binary Image (Otsu Threshold)')
+plt.axis('off')
+plt.show()
+
