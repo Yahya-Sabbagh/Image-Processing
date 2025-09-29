@@ -1,0 +1,55 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+
+file_path = '/content/crossroad.dat'
+crossroad_image_data = np.fromfile(file_path, dtype=np.uint8)
+
+
+num_rows = 435
+num_cols = crossroad_image_data.size // num_rows
+crossroad_image = crossroad_image_data.reshape((num_rows, num_cols))
+
+
+plt.imshow(crossroad_image, cmap='gray')
+plt.title("Reshaped Crossroad Image")
+plt.axis('off')
+plt.show()
+
+first_pixel_value = crossroad_image[0, 0]
+print(f"First pixel value: {first_pixel_value} at row 0, column 0")
+
+
+bottom_right_pixel_value = crossroad_image[-1, -1]
+print(f"Bottom-right pixel value: {bottom_right_pixel_value}")
+
+
+L1 = crossroad_image[0, :]
+C1 = crossroad_image[:, 0]
+
+plt.figure()
+plt.plot(L1)
+plt.title("First Row Vector (L1)")
+plt.xlabel("Column Index")
+plt.ylabel("Pixel Value")
+plt.show()
+
+plt.figure()
+plt.plot(C1)
+plt.title("First Column Vector (C1)")
+plt.xlabel("Row Index")
+plt.ylabel("Pixel Value")
+plt.show()
+
+plt.imshow(crossroad_image, cmap='gray')
+plt.title("Entire Crossroad Image")
+plt.axis('off')
+plt.show()
+
+image = Image.fromarray(crossroad_image)
+image.save("crossroad_image.png")
+image.save("crossroad_image.tif")
+image.save("crossroad_image.jpg")
+
+
+
