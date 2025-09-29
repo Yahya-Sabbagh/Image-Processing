@@ -1,0 +1,17 @@
+from skimage.util import random_noise
+from skimage.restoration import denoise_tv_chambolle
+from scipy.ndimage import median_filter
+
+noisy_image = random_noise(image_T, mode='s&p', amount=0.02)
+median_filtered_image = median_filter(noisy_image, size=3)
+fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+axes[0].imshow(noisy_image, cmap='gray')
+axes[0].set_title("Noisy Image (Salt & Pepper)")
+axes[0].axis('off')
+
+axes[1].imshow(median_filtered_image, cmap='gray')
+axes[1].set_title("Median Filtered Image")
+axes[1].axis('off')
+
+plt.tight_layout()
+plt.show()
