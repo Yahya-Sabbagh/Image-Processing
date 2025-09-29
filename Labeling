@@ -1,0 +1,67 @@
+from skimage.color import label2rgb
+
+
+chro_image_path = '/content/chro.bmp'
+chro_image = Image.open(chro_image_path).convert('L')
+chro_array = np.array(chro_image)
+
+
+otsu_chro_threshold = threshold_otsu(chro_array)
+binary_chro = (chro_array > otsu_chro_threshold).astype(np.uint8)
+
+
+labeled_chro = label(binary_chro, connectivity=2)
+num_objects = labeled_chro.max()
+plt.figure(figsize=(10, 6))
+
+
+plt.subplot(1, 2, 1)
+plt.imshow(labeled_chro, cmap='jet')
+plt.title('Labeled Image (Jet Colormap)')
+plt.axis('off')
+
+colored_chro = label2rgb(labeled_chro, bg_label=0, bg_color=(0, 0, 0))
+plt.subplot(1, 2, 2)
+plt.imshow(colored_chro)
+plt.title('Labeled Image (Label2RGB)')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+num_objects
+
+
+original_image_path = '/content/original.bmp'
+original2_image_path = '/content/original2.bmp'
+
+original_image = Image.open(original_image_path).convert('L')
+original2_image = Image.open(original2_image_path).convert('L')
+
+original_array = np.array(original_image)
+original2_array = np.array(original2_image)
+
+difference = np.abs(original_array - original2_array)
+
+threshold = 30
+binary_difference = (difference > threshold).astype(np.uint8)
+
+labeled_differences = label(binary_difference, connectivity=2)
+num_differences = labeled_differences.max()
+
+plt.figure(figsize=(10, 6))
+
+plt.subplot(1, 2, 1)
+plt.imshow(difference, cmap='gray')
+plt.title('Absolute Difference')
+plt.axis('off')
+
+plt.subplot(1, 2, 2)
+plt.imshow(labeled_differences, cmap='jet')
+plt.title('Labeled Differences')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+num_differences
