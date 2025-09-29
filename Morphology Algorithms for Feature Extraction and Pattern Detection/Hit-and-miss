@@ -1,0 +1,70 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+
+# Upload the image file
+uploaded = files.upload()
+
+# Get the file name (assuming only one file is uploaded)
+image_path = list(uploaded.keys())[0]
+
+# Load the image in grayscale mode
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if the image was loaded successfully
+if image is None:
+    print(f"Error: Image not found or could not be loaded. Check the file path: {image_path}")
+    exit()
+
+# Threshold the image to create a binary image
+_, binary_image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY_INV)
+
+# Define structuring elements for the letter 'e'
+# Example structuring elements (you may need to adjust these)
+foreground = np.array([
+    [0, 1, 0],
+    [1, 1, 1],
+    [0, 1, 0]
+], dtype=np.uint8)
+
+background = np.array([
+    [1, 0, 1],
+    [0, 0, 0],
+    [1, 0, 1]
+], dtype=np.uint8)
+
+# Combine foreground and background into a single kernel
+kernel = cv2.bitwise_not(background)  # Invert background
+kernel[foreground == 1] = 1  # Set foreground pixels
+
+# Apply the hit-and-miss transformation
+hit_or_miss_result = cv2.morphologyEx(binary_image, cv2.MORPH_HITMISS, kernel)
+
+# Convert the result to a binary image (0s and 255s)
+hit_or_miss_result = hit_or_miss_result.astype(np.uint8) * 255
+
+# Display the results
+plt.figure(figsize=(15, 5))
+
+# Original Binary Image
+plt.subplot(1, 3, 1)
+plt.imshow(binary_image, cmap='gray')
+plt.title('Original Binary Image')
+plt.axis('off')
+
+# Hit-or-Miss Result
+plt.subplot(1, 3, 2)
+plt.imshow(hit_or_miss_result, cmap='gray')
+plt.title('Hit-or-Miss Result (Detected "e")')
+plt.axis('off')
+
+# Overlay the detected 'e' on the original image
+overlay = cv2.bitwise_and(binary_image, binary_image, mask=hit_or_miss_result)
+plt.subplot(1, 3, 3)
+plt.imshow(overlay, cmap='gray')
+plt.title('Detected "e" Overlay')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
