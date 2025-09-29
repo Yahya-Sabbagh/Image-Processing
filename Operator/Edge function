@@ -1,0 +1,21 @@
+from skimage.feature import canny
+
+edges_canny = canny(image_T, sigma=1.0)
+edges_sobel = filters.sobel(image_T) > 0.1
+edges_prewitt = filters.prewitt(image_T) > 0.1
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(edges_canny, cmap='gray')
+axes[0].set_title("Canny Edge Detection")
+axes[0].axis('off')
+
+axes[1].imshow(edges_sobel, cmap='gray')
+axes[1].set_title("Sobel Edge Detection (Thresholded)")
+axes[1].axis('off')
+
+axes[2].imshow(edges_prewitt, cmap='gray')
+axes[2].set_title("Prewitt Edge Detection (Thresholded)")
+axes[2].axis('off')
+
+plt.tight_layout()
+plt.show()
