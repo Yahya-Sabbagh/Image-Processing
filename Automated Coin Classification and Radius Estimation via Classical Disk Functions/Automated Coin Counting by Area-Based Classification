@@ -49,3 +49,123 @@ plt.title('Binary Image (Otsu Threshold)')
 plt.axis('off')
 plt.show()
 
+coins_image = imread(coins_image_path)
+binary_coins_image = coins_image > 128
+coins_labels = label(binary_coins_image)
+coin_regions = regionprops(coins_labels)
+TAB = [region.area for region in coin_regions]
+
+plt.plot(TAB, linestyle='none', marker='*')
+plt.title('Visualization of Areas (TAB)')
+plt.xlabel('Object Index')
+plt.ylabel('Area')
+plt.grid(True)
+plt.show()
+filtered_indices = [index for index, area in enumerate(TAB) if 1500 <= area <= 2000]
+filtered_indices
+
+plt.plot(TAB, linestyle='none', marker='*', label='All Objects')
+plt.scatter(filtered_indices, [TAB[i] for i in filtered_indices], color='red', label='1500 <= Area <= 2000')
+plt.title('Object Areas with Highlighted Range (1500-2000)')
+plt.xlabel('Object Index')
+plt.ylabel('Area')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+filtered_size = len(filtered_indices)
+filtered_size
+
+plt.plot(TAB, linestyle='none', marker='*', label='All Objects')
+plt.scatter(filtered_indices, [TAB[i] for i in filtered_indices], color='red', label=f'Matching Objects: {filtered_size}')
+plt.title('Number of Objects (1500 <= Area <= 2000)')
+plt.xlabel('Object Index')
+plt.ylabel('Area')
+plt.legend()
+plt.grid(True)
+plt.show()
+class_1_elements = len([area for area in TAB if 1500 <= area <= 2000])
+class_2_elements = len([area for area in TAB if 2300 <= area <= 2800])
+class_1_elements, class_2_elements
+
+plt.plot(TAB, linestyle='none', marker='*', label='All Objects')
+plt.scatter(
+    [i for i, area in enumerate(TAB) if 1500 <= area <= 2000],
+    [area for area in TAB if 1500 <= area <= 2000],
+    color='red',
+    label=f'Class 1: {class_1_elements} elements'
+)
+plt.scatter(
+    [i for i, area in enumerate(TAB) if 2300 <= area <= 2800],
+    [area for area in TAB if 2300 <= area <= 2800],
+    color='green',
+    label=f'Class 2: {class_2_elements} elements'
+)
+plt.title('Classified Object Areas')
+plt.xlabel('Object Index')
+plt.ylabel('Area')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+from math import sqrt, pi
+perimeter_data = [region.perimeter for region in coin_regions]
+radii_from_area = [sqrt(area / pi) for area in TAB]
+radii_from_perimeter = [perimeter / (2 * pi) for perimeter in perimeter_data]
+radii_results = list(zip(radii_from_area, radii_from_perimeter))
+radii_results
+
+object_indices = range(len(radii_results))
+radii_area = [r[0] for r in radii_results]
+radii_perimeter = [r[1] for r in radii_results]
+
+plt.figure(figsize=(10, 6))
+plt.plot(object_indices, radii_area, 'o-', label='Radius from Area')
+plt.plot(object_indices, radii_perimeter, 's-', label='Radius from Perimeter')
+plt.title('Comparison of Radii from Area and Perimeter')
+plt.xlabel('Object Index')
+plt.ylabel('Radius')
+plt.legend()
+plt.grid(True)
+plt.show()
+from skimage.measure import regionprops
+coin_regions = regionprops(coins_labels)
+radii_results_combined = [
+    (sqrt(region.area / pi), region.perimeter / (2 * pi)) for region in coin_regions
+]
+radii_results_combined
+
+coin_regions_combined = regionprops(coins_labels)
+radii_results_combined = [
+    (sqrt(region.area / pi), region.perimeter / (2 * pi)) for region in coin_regions_combined
+]
+
+object_indices = range(len(radii_results_combined))
+radii_area_combined = [r[0] for r in radii_results_combined]
+radii_perimeter_combined = [r[1] for r in radii_results_combined]
+plt.figure(figsize=(10, 6))
+plt.plot(object_indices, radii_area_combined, 'o-', label='Radius from Area (Combined)')
+plt.plot(object_indices, radii_perimeter_combined, 's-', label='Radius from Perimeter (Combined)')
+plt.title('Radii from Area and Perimeter (Single regionprops Command)')
+plt.xlabel('Object Index')
+plt.ylabel('Radius')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+radii_classical_from_area = [sqrt(region.area / pi) for region in coin_regions_combined]
+radii_classical_from_perimeter = [region.perimeter / (2 * pi) for region in coin_regions_combined]
+radii_classical_results = list(zip(radii_classical_from_area, radii_classical_from_perimeter))
+
+object_indices = range(len(radii_classical_results))
+plt.figure(figsize=(10, 6))
+plt.plot(object_indices, radii_classical_from_area, 'o-', label='Radius from Area (Classical Function)')
+plt.plot(object_indices, radii_classical_from_perimeter, 's-', label='Radius from Perimeter (Classical Function)')
+plt.title('Radii Approximation Using Classical Disk Functions')
+plt.xlabel('Object Index')
+plt.ylabel('Radius')
+plt.legend()
+plt.grid(True)
+plt.show()
+
