@@ -1,0 +1,15 @@
+from scipy.ndimage import generic_filter
+
+
+def max_convolution(image, kernels, mode='nearest'):
+    responses = np.stack([convolve(image, kernel, mode=mode) for kernel in kernels.values()], axis=-1)
+    max_response = np.max(responses, axis=-1)
+    return max_response
+
+max_response_image = max_convolution(image_T, kernels, mode='nearest')
+
+plt.figure(figsize=(6, 6))
+plt.imshow(max_response_image, cmap='gray')
+plt.title("Maximum Convolution Response")
+plt.axis('off')
+plt.show()
