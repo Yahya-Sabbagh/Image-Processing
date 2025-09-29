@@ -1,0 +1,44 @@
+import matplotlib.pyplot as plt
+from skimage import io, filters
+import numpy as np
+from scipy.ndimage import convolve
+
+
+image_path = "/content/T.png"
+image_T = io.imread(image_path, as_gray=True)
+
+sobel_image = filters.sobel(image_T)
+prewitt_image = filters.prewitt(image_T)
+
+kernels = {
+    'North': np.array([[-1, -2, -1],[ 0 , 0 , 0], [ 1,  2,  1]]),
+    'South': np.array([[ 1 , 2  ,1],[ 0,  0 , 0],[-1, -2, -1]]),
+    'East': np.array([[-1 ,0  ,1], [-2 , 0 , 2], [-1 , 0  ,1]]),
+    'West': np.array([[ 1 , 0 ,-1], [ 2,  0 ,-2],[ 1,  0, -1]])
+}
+
+
+directional_responses = {direction: convolve(image_T, kernel) for direction, kernel in kernels.items()}
+
+fig, axes = plt.subplots(3, 3, figsize=(12, 12))
+axes = axes.ravel()
+
+axes[0].imshow(image_T, cmap='gray')
+axes[0].set_title("Original Image (T)")
+axes[0].axis('off')
+
+axes[1].imshow(sobel_image, cmap='gray')
+axes[1].set_title("Sobel Filter")
+axes[1].axis('off')
+
+axes[2].imshow(prewitt_image, cmap='gray')
+axes[2].set_title("Prewitt Filter")
+axes[2].axis('off')
+
+for idx, (direction, response) in enumerate(directional_responses.items(), start=3):
+    axes[idx].imshow(response, cmap='gray')
+    axes[idx].set_title(f"{direction} Direction")
+    axes[idx].axis('off')
+
+plt.tight_layout()
+plt.show()
