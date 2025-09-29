@@ -1,0 +1,71 @@
+original_image = Image.open(image_paths["original"]).convert('L')
+original2_image = Image.open(image_paths["original2"]).convert('L')
+
+original_array = np.array(original_image)
+original2_array = np.array(original2_image)
+difference_array = np.abs(original_array - original2_array)
+
+plt.figure(figsize=(15, 5))
+
+
+plt.subplot(1, 3, 1)
+plt.imshow(original_array, cmap='gray')
+plt.title("Original Image")
+plt.axis('off')
+
+plt.subplot(1, 3, 2)
+plt.imshow(original2_array, cmap='gray')
+plt.title("Original2 Image")
+plt.axis('off')
+
+plt.subplot(1, 3, 3)
+plt.imshow(difference_array, cmap='viridis')
+plt.title("Difference Image")
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# threshold is variable (I put it as 35)
+threshold = 35
+error_count = np.sum(difference_array > threshold)
+error_count
+chro_image_path = '/content/chro.tif'
+
+chro_image = Image.open(chro_image_path).convert('L')
+chroOp_image = Image.open(image_paths["chroOp"]).convert('L')
+chroL_image = Image.open(image_paths["chroL"]).convert('L')
+
+chro_array = np.array(chro_image)
+chroOp_array = np.array(chroOp_image)
+chroL_array = np.array(chroL_image)
+
+difference_chro = np.abs(chroOp_array - chroL_array)
+
+threshold = 30
+mask = difference_chro > threshold
+
+chro_rgb = np.stack([chro_array] * 3, axis=-1)
+
+highlighted_image = chro_rgb.copy()
+highlighted_image[mask] = [255, 0, 0]
+
+plt.figure(figsize=(18, 6))
+
+plt.subplot(1, 3, 1)
+plt.imshow(chro_array, cmap='gray')
+plt.title("Original Image (chro)")
+plt.axis('off')
+
+plt.subplot(1, 3, 2)
+plt.imshow(difference_chro, cmap='viridis')
+plt.title("Difference Image (chroOp - chroL)")
+plt.axis('off')
+
+plt.subplot(1, 3, 3)
+plt.imshow(highlighted_image)
+plt.title("Highlighted Differences on Original")
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
