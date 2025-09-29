@@ -49,4 +49,20 @@ convolved_image = convolve(image, gaussian_kernel_2d, mode='reflect')
 
 convolved_self_image = convolve(convolved_image, convolved_image, mode='reflect')
 
+image_small_section = image[:50, :50]
+convolved_image_small_section = convolve(image_small_section, gaussian_kernel_2d, mode='reflect')
+plt.figure(figsize=(8, 4))
+
+plt.subplot(1, 2, 1)
+plt.imshow(image_small_section, cmap='gray')
+plt.title("Original Image Section")
+plt.axis('off')
+
+plt.subplot(1, 2, 2)
+plt.imshow(convolved_image_small_section, cmap='gray')
+plt.title("Gaussian-Convolved Section")
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
 
