@@ -15,3 +15,33 @@ axes[1].axis('off')
 
 plt.tight_layout()
 plt.show()
+
+lena1 = io.imread('/content/lena1.tif', as_gray=True)
+lena2 = io.imread('/content/lena2.tif', as_gray=True)
+lena3 = io.imread('/content/lena3.tif', as_gray=True)
+lena4 = io.imread('/content/lena4.tif', as_gray=True)
+
+
+lena1_filtered = median_filter(lena1, size=3)
+lena2_filtered = filters.gaussian(lena2, sigma=1)
+lena3_filtered = lena3.copy()
+lena4_filtered = filters.gaussian(lena4, sigma=1)
+
+fig, axes = plt.subplots(4, 2, figsize=(12, 12))
+axes = axes.ravel()
+
+images = [lena1, lena1_filtered, lena2, lena2_filtered, lena3, lena3_filtered, lena4, lena4_filtered]
+titles = [
+    "Original Lena1 (Salt & Pepper)", "Filtered Lena1 (Median)",
+    "Original Lena2 (Edge Enhanced)", "Filtered Lena2 (Gaussian)",
+    "Original Lena3 (Clean)", "Filtered Lena3 (Identity)",
+    "Original Lena4 (Gaussian Noise)", "Filtered Lena4 (Gaussian)"
+]
+
+for i, (image, title) in enumerate(zip(images, titles)):
+    axes[i].imshow(image, cmap='gray')
+    axes[i].set_title(title)
+    axes[i].axis('off')
+
+plt.tight_layout()
+plt.show()
