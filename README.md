@@ -1,2 +1,1 @@
-# Image-Processing
-This repository covers fundamental concepts and practical algorithms for analyzing, transforming, and enhancing digital images.
+Collection of image processing techniques and implementations in Python
